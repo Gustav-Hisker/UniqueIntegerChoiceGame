@@ -27,12 +27,12 @@
 <h1>Unique Integer Choice Game</h1>
 <h2>Explanation of the Task</h2>
 <p>
-    So the game is the following: You're in a pool of $n$ players. Also given are $k, w \in \Bbb N\setminus \{0\}$. You know $n$, $k$ and $w$.
+    So the game is the following: You're in a pool of $n$ players. Also given are $k, w \in \Bbb Z^+$. You know $n$, $k$ and $w$.
     Each turn you submit an integer $i$ where $1 \le i \le k$.
     If you're the only one who submitted this integer then you get $i$ points added to your score $s$. Which starts at $0$.
 </p>
 <p>
-    If $s \equiv 0 \pmod w$ you've won.
+    If $s \equiv 0 \pmod w \land s\not=0$ you've won.
 </p>
 <p>
     After each turn you're told about the turns of all the other people.

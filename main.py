@@ -4,15 +4,13 @@ import random
 import subprocess
 import sys
 from os import makedirs
+from subprocess import Popen, PIPE
 from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, Form, UploadFile, File
 from fastapi.responses import HTMLResponse
-
-from subprocess import Popen, PIPE
-
-from starlette.responses import StreamingResponse, JSONResponse, FileResponse
+from starlette.responses import StreamingResponse, JSONResponse
 
 pyPath = "./python-submissions/"
 cppPath = "./cpp-submissions/"
@@ -59,7 +57,7 @@ class ProgramHandler:
                 raise Exception(f"No output received from subprocess {self.path}")
         resInt = -1
         try:
-            return int(result.strip())
+            resInt = int(result.strip())
         except:
             pass
         if 1 <= resInt <= self.k:
@@ -115,16 +113,18 @@ def game(paths: list[str], k: int, w: int):
             else:
                 submissionCounts[submission] += 1
 
-        yield False, scores, submissions, "current game state"
 
         for i, s in enumerate(submissions):
             if submissionCounts[s] <= 1:
                 scores[i] += s
                 if scores[i]%w == 0:
+                    yield False, scores, submissions, "current game state"
                     while programs:
                         del programs[0]
                     yield True,1, i, "Win"
                     return
+
+        yield False, scores, submissions, "current game state"
 
     while programs:
         del programs[0]
@@ -361,6 +361,31 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
     return json.dumps({"n":n,"k":k,"w":w,"names":names,"score-list":scoreList, "submission-list":submissionList, "ending": -1, "winner": -1, "value": "unknown error"})
 
 
+def getAllMatchUps(programs,n):
+    if n == 0:
+        yield []
+        return
+    for program in programs:
+        for matchUp in getAllMatchUps(programs, n-1):
+            yield matchUp + [program]
+
+@app.get("/tournament", response_class=JSONResponse)
+def tournament(n: int = 5, k: int = 5, w: int = 20):
+    programs = allPrograms()
+    overallScore = {p:0 for p in programs}
+    assert n>=2
+    for mu in getAllMatchUps(programs, n):
+        outcome, program = None, None
+        for cs in game(mu, k, w):
+            _, outcome, program, _ = cs
+
+        if outcome == -1:
+            overallScore[mu[program]] -= 1
+        elif outcome == 1:
+            overallScore[mu[program]] += 1
+
+    return overallScore
+
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
