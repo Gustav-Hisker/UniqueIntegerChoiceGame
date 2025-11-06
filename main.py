@@ -358,7 +358,7 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
         else:
             scoreList.append(gs[1].copy())
             submissionList.append(gs[2].copy())
-    return json.dumps({"n":n,"k":k,"w":w,"names":names,"score-list":scoreList, "submission-list":submissionList, "ending": -1, "winner": -1, "value": "unknown error"})
+    return {"n":n,"k":k,"w":w,"names":names,"score-list":scoreList, "submission-list":submissionList, "ending": -1, "winner": -1, "value": "unknown error"}
 
 
 def getAllMatchUps(programs,n):
