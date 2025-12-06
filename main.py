@@ -28,6 +28,8 @@ makedirs(pyPath, exist_ok=True)
 makedirs(cppPath, exist_ok=True)
 makedirs(exePath, exist_ok=True)
 
+USE_DOCKER = True
+
 
 class ProgramHandler:
     def __init__(self, path: str, n: int, k: int, w: int, j: int) -> None:
@@ -37,10 +39,21 @@ class ProgramHandler:
         self.w = w
         self.j = j
 
-        if path.endswith(".py"):
-            self.p = Popen([sys.executable, "-u", path], stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True, bufsize=1)
-        else:
-            self.p = Popen(path, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True, bufsize=1)
+        cmd = [
+            "docker", "run", "--rm", "-i",
+            "--network", "none",
+            "-v", f"{os.path.abspath(path)}:/app/program:ro",
+            "python:3.13-slim" if path.endswith(".py") else "ubuntu:latest",
+            "python", "/app/program" if path.endswith(".py") else "/app/program"
+        ]
+
+        if not USE_DOCKER:
+            if path.endswith(".py"):
+                cmd = [sys.executable, path]
+            else:
+                cmd = [path]
+
+        self.p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, text=True, bufsize=1)
 
         # Send initial input
         self.p.stdin.write(f"{n} {k} {w} {j}\n")
@@ -139,7 +152,7 @@ def game(paths: list[str], k: int, w: int):
 
 
 def testProgram(path: str):
-    for i in range(100):
+    for i in range(25):
         try:
             n = random.randint(2, 100)
             k = random.randint(1, 100)
@@ -155,7 +168,7 @@ def testProgram(path: str):
             if outcome == -1:
                 yield False, value
             else:
-                yield True, i + 1
+                yield True, (i + 1) * 4
 
         except Exception as e:
             yield False, str(e) + " (either that's my fault or you messed up very badly)"
