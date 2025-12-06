@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Unique Integer Choice Game</title>
+    <title>Unique Auction Card Game</title>
     <style>
         /**
          * matcha.css — 3.0.0
@@ -23,267 +23,71 @@
     </script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
 </head>
-<body style="padding-bottom: 30px">
-<h1>Unique Integer Choice Game</h1>
-<h2>Explanation of the Task</h2>
-<p>
-    So the game is the following: You're in a pool of $n$ players. Also given are $k, w \in \Bbb Z^+$. You know $n$, $k$ and $w$.
-    Each turn you submit an integer $i$ where $1 \le i \le k$.
-    If you're the only one who submitted this integer then you get $i$ points added to your score $s$. Which starts at $0$.
-</p>
-<p>
-    If $s \equiv 0 \pmod w \land s\not=0$ you've won.
-</p>
-<p>
-    After each turn you're told about the turns of all the other people.
-</p>
-<h2>Explanation of the input and output format.</h2>
-<p>
-    At the beginning of a new game your program is executed as a new process. Meaning you can't remember previous games.
-    But indeed you can remember the previous rounds in the current game you're playing.
-</p>
-<p>
-    All the input you get by <code>stdin</code>.
-    This means for example you can get the input with <code>cin</code> in C++ and <code>input()</code> in python.
-    The output the game requires from you can be submitted via <code>stdout</code>.
-    This means for example you can output using <code>cout</code> in C++ and using <code>print</code> or <code>printf</code> in python.
-</p>
-<p>
-    As input initially it's send the number $n$, $k$, $w$ and $j$ where $n$, $k$ and $w$ are as before and $j$ is your position in the pool of players.
-    This is done in the following format followed by a linebreak (<code>"\n"</code>):
-    <br><code>n k w j</code><br>
-    For example if $n=10$ (so there are $10$ players), $k=5$ (meaning you can choose your numbers between $1$ and $5$),
-    $w=50$ (you win with a score equal to a multiple of $50$) and you're number is $7$ the input looks like this:
-    <br><code>10 5 50 7</code><br>
-</p>
-<p>
-    Then your program has to decide the first number it submits.
-    If you're output is not an integer between $1$ and $k$ then you're immediately disqualified.
-    <b>IMPORTANT:</b> You have to end your output with a linebreak (<code>"\n"</code>).
-</p>
-<p>
-    Now you get all the submissions $i_0, ..., i_j, ... i_{n-1}$ that were done by you and the other players.
-    Where $i_x$ is the number submitted by the $x$-th player. So $i_j$ is the number you submitted.
-    Your code gets them in the following format:
-    <br><code>i_0 i_1 ... i_j ... i_(n-1)</code>
-</p>
-<p>
-    As an example: There are 4 players. The first/$0$-th player submits $1$, the second/$1$-th player submits $3$, the next one submits $1$ and the last one submits $2$.
-    <br><code>1 3 1 2</code><br>
-    (In this case the second/$1$-th player gets $3$ points and the last one gets $2$ points)
-</p>
-<p>
-    Then again you have to submit a new number and . From here on it just repeats.
-</p>
-<p>
-    As an example for a whole game. Here the "conversation" between <span style="color:magenta">your program</span> and <span style="color:green">the game</span>:
-    <br><code style="color:green">10 5 20 7</code>
-
-    <br><code style="color:magenta">5</code>
-
-    <br><code style="color:green">5 2 4 4 2 1 3 5 4 5</code>
-
-    <br><code style="color:magenta">5</code>
-
-    <br><code style="color:green">3 4 5 1 3 2 3 5 1 2</code>
-
-    <br><code style="color:magenta">3</code>
-
-    <br><code style="color:green">3 2 5 4 1 4 3 3 1 2</code>
-
-    <br><code>...</code>
-</p>
-<h2>Example Code</h2>
-<h3>Python</h3>
-The following python code always outputs the highest possible number ($k$):
-<pre><code># read n, k, w and j
-n, k, w, j = map(int, input().split())
-
-# repeating for the whole game
-while True:
-    # outputting the highest allowed number
-    print(k)
-    # reading the input but ignoring it
-    submitted_numbers = list(map(int, input().split()))</code></pre>
-The following python code outputs random numbers in the range of $1$ to $k$:
-<pre><code># import random to get randomness
-from random import randint
-
-# read n, k, w and j
-n, k, w, j = map(int, input().split())
-
-# repeating for the whole game
-while True:
-    # outputting random integer
-    print(randint(1, n))
-    # reading the input but ignoring it
-    submitted_numbers = list(map(int, input().split()))</code></pre>
-<h3>C++</h3>
-The following C++ code always outputs the highest possible number ($k$):
-<pre><code>#include&le;iostream>
-#include &le;vector>
-
-int main(){
-    // read n, k, w and j
-    int n, k, w, j;
-    std::cin >> n >> k >> w >> j;
-
-    // repeating for the whole game
-    while (true){
-        // outputting the highest number
-        std::cout << k << std::endl;
-        // reading the input but ignoring it
-        std::vector&le;int> submitted_numbers(n);
-        for (int i = 0; i < n; i++) {
-            std::cin >> submitted_numbers[i];
-        }
-    }
-}</code></pre>
-The following C++ code outputs random numbers in the range of $1$ to $k$:
-<pre><code>#include&le;iostream>
-#include &le;random> // for the randomness
-#include &le;vector>
-
-int main(){
-    // read n, k, w and j
-    int n, k, w, j;
-    std::cin >> n >> k >> w >> j;
-
-    // creating a random device
-    std::random_device rand_dev;
-    // creating a random generator
-    std::mt19937 gen(rand_dev());
-    // creating distribution
-    std::uniform_int_distribution&le;int> distr(1, k);
-
-    // repeating for the whole game
-    while (true){
-        // outputting random integer
-        std::cout << distr(gen) << std::endl;
-        // reading the input but ignoring it
-        std::vector&le;int> submitted_numbers(n);
-        for (int i = 0; i < n; i++) {
-            std::cin >> submitted_numbers[i];
-        }
-    }
-}</code></pre>
-
-<h2>
-    How to submit a program
-</h2>
-<form method="post" action="/upload.py" enctype="multipart/form-data" title="Python upload"><div>
-    <h3 style="margin-top:0">If you're using python you can upload your python code as a .py-file here:</h3>
-    <input type="text" name="team" placeholder="Team name" required>
-    <input
-        type="file"
-        name="file"
-        accept=".py"
-        value="Select .py-file"
-        title="Select .py-file"
-        required
-    />
-    <input type="submit" value="Submit">
+<body>
+<h1>Unique Auction Card Game</h1>
+<h2>Admin Board</h2>
+<form id="login" action="javascript:enterPW()"><div>
+    <h3 style="margin-top: 0">Enter the admin password to log in.</h3>
+    <input name="pw" id="pw-input" placeholder="password" required="required">
+    <input type="submit" value="Enter">
 </div></form>
-<form method="post" action="/upload.cpp" enctype="multipart/form-data" title="C++ upload"><div>
-    <h3 style="margin-top:0">If you're using C++ you can upload your C++ code as a .cpp-file here:</h3>
-    <input type="text" name="team" placeholder="Team name" required>
-    <input
-        type="file"
-        name="file"
-        accept=".cpp"
-        value="Select .cpp-file"
-        title="Select .cpp-file"
-        required
-    />
-    <input type="submit" value="Submit">
-</div></form>
-<form method="post" action="/upload.exe" enctype="multipart/form-data" title="Executable upload"><div>
-    <h3 style="margin-top:0">If you want to submit an already compiled executable you can upload it here:</h3>
-    <input type="text" name="team" placeholder="Team name" required>
-    <input
-        type="file"
-        name="file"
-        accept="*"
-        value="Select executable"
-        title="Select executable"
-        required
-    />
-    <input type="submit" value="Submit">
-</div></form>
-<h2>Live Arena</h2>
-<a href="/randomGameDisplay">Here</a> you can watch random games illustrated on a blackboard.
+<div id="board" hidden="hidden">
+    <div><b>Start Tournament</b><button onclick="startTournament()">Start</button></div>
+</div>
 </body>
+<script>
+    const validationUrl = "/validatePW"
+    const startUrl = "/start-tournament"
+    let pw = ""
 
+    function post(url, body){
+        return fetch(url, {method: "POST",headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+    }
 
-<!-- from here on only highlight.js stuff -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    async function enterPW(){
+        const pwinput = document.getElementById("pw-input");
+        pw = pwinput.value;
+        pwinput.value = "";
+        let pwCorrect = false;
 
-<!-- and it's easy to individually load additional languages -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/go.min.js"></script>
+        try {
+            const response = await post(validationUrl,{"pw":pw});
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
 
-<script>hljs.highlightAll();</script>
-<style>
-    /*
+            pwCorrect = (await response.json());
+        } catch (error) {
+            console.error(error.message);
+        }
 
-VS Dark theme based off the theme distributed with the Monaco editor by Twineee <twineee@tutamail.com>
+        if (pwCorrect===true){
+            document.getElementById("login").hidden = true;
+            document.getElementById("board").hidden = false;
+        } else {
+            alert("Wrong password")
+        }
+    }
 
-*/
-.hljs {
-  background: #202020;
-  color: #CCCCCC;
-}
+    async function startTournament(){
+        try {
+            const response = await post(startUrl,{"pw":pw});
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
 
-.hljs-comment,
-.hljs-doctag,
-.hljs-quote,
-.hljs-variable {
-  color: #6A9954;
-}
-
-.hljs-keyword,
-.hljs-selector-tag,
-.hljs-built_in,
-.hljs-name,
-.hljs-tag {
-  color: #579CD6;
-}
-
-.hljs-string,
-.hljs-title,
-.hljs-section,
-.hljs-attribute,
-.hljs-literal,
-.hljs-template-tag,
-.hljs-template-variable,
-.hljs-type,
-.hljs-addition {
-  color: #CE9178;
-}
-
-.hljs-deletion,
-.hljs-selector-attr,
-.hljs-selector-pseudo,
-.hljs-meta {
-  color: #D4D4D4;
-}
-
-.hljs-attr {
-  color: #9DDCFE;
-}
-
-.hljs-symbol,
-.hljs-bullet,
-.hljs-link {
-  color: #00b0e8;
-}
-
-
-.hljs-emphasis {
-  font-style: italic;
-}
-
-.hljs-strong {
-  font-weight: bold;
-}
-</style>
+            let json = (await response.json());
+            console.log(json)
+            if (json.ok !== true){
+                if (json.error){
+                    alert(json.error);
+                } else {
+                    alert("Somewhere something somehow went wrong");
+                }
+            }
+        } catch (error) {
+            alert("Error starting the tournament:\n" + error.message);
+        }
+    }
+</script>
+</html>

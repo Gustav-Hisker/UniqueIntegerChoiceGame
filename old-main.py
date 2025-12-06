@@ -1,25 +1,20 @@
+import json
 import os
 import random
-import string
 import subprocess
 import sys
-import threading
 from os import makedirs
-from random import shuffle
 from subprocess import Popen, PIPE
 from typing import Annotated
 
 import uvicorn
 from fastapi import FastAPI, Form, UploadFile, File
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
 from starlette.responses import StreamingResponse, JSONResponse
 
 pyPath = "./python-submissions/"
 cppPath = "./cpp-submissions/"
 exePath = "./executable-submissions/"
-
-adminPW = "".join([random.choice(string.ascii_letters + string.digits) for _ in range(8)])
 
 compileTimeout = 10
 testCode = "./examples/random-integers.py"
@@ -86,8 +81,7 @@ def game(paths: list[str], k: int, w: int):
         except Exception as e:
             while programs:
                 del programs[0]
-            yield True,-1, i, "Initialisation error: " + str(e)
-            return
+            return True,-1, i, "Initialisation error: " + str(e)
 
     scores = [0 for _ in programs]
     submissions = [0 for _ in programs]
@@ -175,13 +169,13 @@ app = FastAPI()
 
 
 @app.get("/", response_class=HTMLResponse)
-async def root():
+def root():
     with open("html/index.html") as f:
         return f.read()
 
 # PYTHON
 @app.post("/upload.py", response_class=HTMLResponse)
-async def wrapperUploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
+def wrapperUploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadPy(team, file), media_type="html")
 
 def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
@@ -222,7 +216,7 @@ def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
 
 # C++
 @app.post("/upload.cpp", response_class=HTMLResponse)
-async def wrapperUploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
+def wrapperUploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadCpp(team, file), media_type="html")
 
 def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
@@ -248,7 +242,7 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     yield "<p>Compilation successful</p>"
     es = ""
     try:
-        subp = subprocess.run(f"g++ -std=c++20 -o \"{exePath}{team}.temp\" \"{cppPath}{team}.cpp\"",shell=True, capture_output=True, timeout=compileTimeout)
+        subp = subprocess.run(f"g++ -std=c++20 -o {exePath}{team}.temp {cppPath}{team}.cpp",shell=True, capture_output=True, timeout=compileTimeout)
         es = subp.stderr.decode()
         subp.check_returncode()
     except Exception as e:
@@ -274,7 +268,7 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
 
 # EXECUTABLE
 @app.post("/upload.exe", response_class=HTMLResponse)
-async def wrapperUploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
+def wrapperUploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadExe(team, file), media_type="html")
 
 def uploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
@@ -333,32 +327,18 @@ def testUpload(path):
 
 
 @app.get("/randomGameDisplay", response_class=HTMLResponse)
-async def randomGameDisplay():
+def randomGameDisplay():
     with open("html/random-game.html") as f:
         return f.read()
 
 
-@app.get("/background.jpeg")
-async def background():
+@app.get("/chalkFont.ttf")
+def loadgif():
     def iterfile():
-        with open("assets/background.jpeg", mode="rb") as file_like:
+        with open("./chalk-font.ttf", mode="rb") as file_like:
             yield from file_like
 
-    return StreamingResponse(iterfile(), media_type="jpeg")
-
-def getAllMatchUps(programs):
-    for n in range(3,6):
-        yield from getAllMatchUpsWithFixedSize(programs, n)
-
-def getAllMatchUpsWithFixedSize(programs,n):
-    if n > len(programs):
-        return
-    if n == 0:
-        yield []
-        return
-    for program in programs:
-        for matchUp in getAllMatchUpsWithFixedSize(set(programs)-{program}, n-1):
-            yield matchUp + [program]
+    return StreamingResponse(iterfile(), media_type="ttf")
 
 
 @app.get("/randomGame", response_class=JSONResponse)
@@ -381,80 +361,31 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
     return {"n":n,"k":k,"w":w,"names":names,"score-list":scoreList, "submission-list":submissionList, "ending": -1, "winner": -1, "value": "unknown error"}
 
 
-scores = {}
-muCount = 0
-playedGames = 0
-
-class TournamentThread(threading.Thread):
-    def __init__(self, mu):
-        threading.Thread.__init__(self)
-        self.mu = mu
-
-    def run(self):
-        global scores, playedGames
-        d = 0
-        id = 0
-
-        for cs in game(self.mu,5,20):
-            _, id, d, _ = cs
-
-
-        scores[self.mu[id]] += d
-
-        playedGames += 1
-
-class pwWrapper(BaseModel):
-    pw: str
-@app.post("/start-tournament", response_class=JSONResponse)
-async def startTournament(wrapper : pwWrapper):
-    if wrapper.pw != adminPW: return{"ok":False, "error":"Invalid password"}
-    global scores, playedGames, muCount
-    if muCount > playedGames: return{"ok":False, "error":"Tournament is still running"}
-    programs = allPrograms()
-    scores = {p:0 for p in programs}
-    if len(programs) <= 1: return {"ok":False, "error":"Too few players"};
-    mus = list(getAllMatchUps(programs))
-    shuffle(mus)
-    muCount = len(mus)
-    playedGames = 0
-    starterThread = threading.Thread()
-    starterThread.run = lambda : [TournamentThread(mu).start() for mu in mus]
-    starterThread.start()
-    return {"ok":True}
-
+def getAllMatchUps(programs,n):
+    if n == 0:
+        yield []
+        return
+    for program in programs:
+        for matchUp in getAllMatchUps(programs, n-1):
+            yield matchUp + [program]
 
 @app.get("/tournament", response_class=JSONResponse)
-async def tournament():
-    return {
-        "scores": {os.path.basename(f).removesuffix(".py"):s for f, s in scores.items()},
-        "played": playedGames,
-        "games": muCount,
-    }
+def tournament(n: int = 5, k: int = 5, w: int = 20):
+    programs = allPrograms()
+    overallScore = {p:0 for p in programs}
+    assert n>=2
+    for mu in getAllMatchUps(programs, n):
+        outcome, program = None, None
+        for cs in game(mu, k, w):
+            _, outcome, program, _ = cs
 
+        if outcome == -1:
+            overallScore[mu[program]] -= 1
+        elif outcome == 1:
+            overallScore[mu[program]] += 1
 
-@app.get("/tournamentDisplay", response_class=HTMLResponse)
-async def tournamentDisplay():
-    with open("html/tournament.html") as f:
-        return f.read()
+    return overallScore
 
-@app.get("/favicon.ico")
-async def favicon():
-    def iterfile():
-        with open("assets/favicon.ico", mode="rb") as file_like:
-            yield from file_like
-
-    return StreamingResponse(iterfile(), media_type="ico")
-
-@app.post("/validatePW", response_class=JSONResponse)
-async def validatePW(wrapper : pwWrapper):
-    return wrapper.pw == adminPW
-
-@app.get("/admin", response_class=HTMLResponse)
-async def admin():
-    with open("html/admin.html") as f:
-        return f.read()
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000)
-else:
-    print(f"The admin password is: {adminPW}")
