@@ -28,6 +28,7 @@ makedirs(pyPath, exist_ok=True)
 makedirs(cppPath, exist_ok=True)
 makedirs(exePath, exist_ok=True)
 
+
 class ProgramHandler:
     def __init__(self, path: str, n: int, k: int, w: int, j: int) -> None:
         self.path = path
@@ -44,7 +45,6 @@ class ProgramHandler:
         # Send initial input
         self.p.stdin.write(f"{n} {k} {w} {j}\n")
         self.p.stdin.flush()
-
 
     def sendSubmissions(self, g: list[int]) -> None:
         self.p.stdin.write(" ".join(map(str, g)) + "\n")
@@ -86,7 +86,7 @@ def game(paths: list[str], k: int, w: int):
         except Exception as e:
             while programs:
                 del programs[0]
-            yield True,-1, i, "Initialisation error: " + str(e)
+            yield True, -1, i, "Initialisation error: " + str(e)
             return
 
     scores = [0 for _ in programs]
@@ -99,7 +99,7 @@ def game(paths: list[str], k: int, w: int):
             except Exception as e:
                 while programs:
                     del programs[0]
-                yield True,-1, i, "Error reading output of the program: " + str(e)
+                yield True, -1, i, "Error reading output of the program: " + str(e)
                 return
 
         for i, p in enumerate(programs):
@@ -108,7 +108,7 @@ def game(paths: list[str], k: int, w: int):
             except Exception as e:
                 while programs:
                     del programs[0]
-                yield True,-1, i, "Error passing the input to program: " + str(e)
+                yield True, -1, i, "Error passing the input to program: " + str(e)
                 return
 
         submissionCounts = {}
@@ -119,15 +119,14 @@ def game(paths: list[str], k: int, w: int):
             else:
                 submissionCounts[submission] += 1
 
-
         for i, s in enumerate(submissions):
             if submissionCounts[s] <= 1:
                 scores[i] += s
-                if scores[i]%w == 0:
+                if scores[i] % w == 0:
                     yield False, scores, submissions, "current game state"
                     while programs:
                         del programs[0]
-                    yield True,1, i, "Win"
+                    yield True, 1, i, "Win"
                     return
 
         yield False, scores, submissions, "current game state"
@@ -135,21 +134,19 @@ def game(paths: list[str], k: int, w: int):
     while programs:
         del programs[0]
 
-
-    yield True,0, -1, "Draw"
+    yield True, 0, -1, "Draw"
     return
 
 
 def testProgram(path: str):
     for i in range(100):
         try:
-            n = random.randint(2,100)
-            k = random.randint(1,100)
-            w = random.randint(1,100)
-            j = random.randrange(0,n)
+            n = random.randint(2, 100)
+            k = random.randint(1, 100)
+            w = random.randint(1, 100)
+            j = random.randrange(0, n)
 
             paths = [(path if i == j else testCode) for i in range(n)]
-
 
             outcome, program, value = None, None, None
             for cs in game(paths, k, w):
@@ -158,7 +155,7 @@ def testProgram(path: str):
             if outcome == -1:
                 yield False, value
             else:
-                yield True, i+1
+                yield True, i + 1
 
         except Exception as e:
             yield False, str(e) + " (either that's my fault or you messed up very badly)"
@@ -166,8 +163,8 @@ def testProgram(path: str):
 
 
 def allPrograms():
-    pys = [pyPath+f for f in os.listdir(pyPath) if os.path.isfile(os.path.join(pyPath, f)) and f.endswith(".py") and not f.endswith(".temp.py")]
-    exes = [exePath+f for f in os.listdir(exePath) if os.path.isfile(os.path.join(exePath, f)) and not f.endswith(".temp")]
+    pys = [pyPath + f for f in os.listdir(pyPath) if os.path.isfile(os.path.join(pyPath, f)) and f.endswith(".py") and not f.endswith(".temp.py")]
+    exes = [exePath + f for f in os.listdir(exePath) if os.path.isfile(os.path.join(exePath, f)) and not f.endswith(".temp")]
     return pys + exes
 
 
@@ -180,15 +177,20 @@ async def root():
         return f.read()
 
 # PYTHON
+
+
 @app.post("/upload.py", response_class=HTMLResponse)
 async def wrapperUploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadPy(team, file), media_type="html")
+
 
 def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
     with open("html/preset.html") as f:
         yield f.read()
 
-    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"): yield "<h1>Fuck Off</h1> This team name is not valid."; return
+    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"):
+        yield "<h1>Fuck Off</h1> This team name is not valid."
+        return
 
     yield "<h2>Submitting python file</h2>"
     yield "<h4>Uploading ...</h4>"
@@ -207,7 +209,8 @@ def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
     for t in testUpload(pyPath + team + ".temp.py"):
         value, ok = t
         yield value
-        if not ok: return
+        if not ok:
+            return
 
     yield "<h3>Saving file</h3>"
     os.replace(pyPath + team + ".temp.py", pyPath + team + ".py")
@@ -221,15 +224,20 @@ def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return
 
 # C++
+
+
 @app.post("/upload.cpp", response_class=HTMLResponse)
 async def wrapperUploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadCpp(team, file), media_type="html")
+
 
 def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     with open("html/preset.html") as f:
         yield f.read()
 
-    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"): yield "<h1>Fuck Off</h1> This team name is not valid."; return
+    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"):
+        yield "<h1>Fuck Off</h1> This team name is not valid."
+        return
 
     yield "<h2>Submitting C++ file</h2>"
     yield "<h4>Uploading ...</h4>"
@@ -248,7 +256,7 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     yield "<p>Compilation successful</p>"
     es = ""
     try:
-        subp = subprocess.run(f"g++ -std=c++20 -o \"{exePath}{team}.temp\" \"{cppPath}{team}.cpp\"",shell=True, capture_output=True, timeout=compileTimeout)
+        subp = subprocess.run(f"g++ -std=c++20 -o \"{exePath}{team}.temp\" \"{cppPath}{team}.cpp\"", shell=True, capture_output=True, timeout=compileTimeout)
         es = subp.stderr.decode()
         subp.check_returncode()
     except Exception as e:
@@ -259,7 +267,8 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     for t in testUpload(exePath + team + ".temp"):
         value, ok = t
         yield value
-        if not ok: return
+        if not ok:
+            return
 
     yield "<h3>Saving file</h3>"
     os.replace(exePath + team + ".temp", exePath + team)
@@ -273,15 +282,20 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return
 
 # EXECUTABLE
+
+
 @app.post("/upload.exe", response_class=HTMLResponse)
 async def wrapperUploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadExe(team, file), media_type="html")
+
 
 def uploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
     with open("html/preset.html") as f:
         yield f.read()
 
-    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"): yield "<h1>Fuck Off</h1> This team name is not valid."; return
+    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"):
+        yield "<h1>Fuck Off</h1> This team name is not valid."
+        return
 
     yield "<h2>Submitting executable</h2>"
     yield "<h4>Uploading ...</h4>"
@@ -301,7 +315,8 @@ def uploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
     for t in testUpload(exePath + team + ".temp"):
         value, ok = t
         yield value
-        if not ok: return
+        if not ok:
+            return
 
     yield "<h3>Saving file</h3>"
     os.replace(exePath + team + ".temp", exePath + team)
@@ -313,6 +328,7 @@ def uploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
 
     yield "</body></html>"
     return
+
 
 def testUpload(path):
     yield "<h4>Testing upload</h4>", True
@@ -346,18 +362,20 @@ async def background():
 
     return StreamingResponse(iterfile(), media_type="jpeg")
 
+
 def getAllMatchUps(programs):
-    for n in range(3,6):
+    for n in range(3, 6):
         yield from getAllMatchUpsWithFixedSize(programs, n)
 
-def getAllMatchUpsWithFixedSize(programs,n):
+
+def getAllMatchUpsWithFixedSize(programs, n):
     if n > len(programs):
         return
     if n == 0:
         yield []
         return
     for program in programs:
-        for matchUp in getAllMatchUpsWithFixedSize(set(programs)-{program}, n-1):
+        for matchUp in getAllMatchUpsWithFixedSize(set(programs) - {program}, n - 1):
             yield matchUp + [program]
 
 
@@ -374,16 +392,17 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
     for gs in game(programs, k, w):
         if gs[0]:
             _, ending, winner, value = gs
-            return {"n":n,"k":k,"w":w,"names":names,"score-list":scoreList, "submission-list":submissionList, "ending": ending, "winner": winner, "value": value}
+            return {"n": n, "k": k, "w": w, "names": names, "score-list": scoreList, "submission-list": submissionList, "ending": ending, "winner": winner, "value": value}
         else:
             scoreList.append(gs[1].copy())
             submissionList.append(gs[2].copy())
-    return {"n":n,"k":k,"w":w,"names":names,"score-list":scoreList, "submission-list":submissionList, "ending": -1, "winner": -1, "value": "unknown error"}
+    return {"n": n, "k": k, "w": w, "names": names, "score-list": scoreList, "submission-list": submissionList, "ending": -1, "winner": -1, "value": "unknown error"}
 
 
 scores = {}
 muCount = 0
 playedGames = 0
+
 
 class TournamentThread(threading.Thread):
     def __init__(self, mu):
@@ -395,38 +414,43 @@ class TournamentThread(threading.Thread):
         d = 0
         id = 0
 
-        for cs in game(self.mu,5,20):
+        for cs in game(self.mu, 5, 20):
             _, id, d, _ = cs
-
 
         scores[self.mu[id]] += d
 
         playedGames += 1
 
+
 class pwWrapper(BaseModel):
     pw: str
+
+
 @app.post("/start-tournament", response_class=JSONResponse)
-async def startTournament(wrapper : pwWrapper):
-    if wrapper.pw != adminPW: return{"ok":False, "error":"Invalid password"}
+async def startTournament(wrapper: pwWrapper):
+    if wrapper.pw != adminPW:
+        return {"ok": False, "error": "Invalid password"}
     global scores, playedGames, muCount
-    if muCount > playedGames: return{"ok":False, "error":"Tournament is still running"}
+    if muCount > playedGames:
+        return {"ok": False, "error": "Tournament is still running"}
     programs = allPrograms()
-    scores = {p:0 for p in programs}
-    if len(programs) <= 1: return {"ok":False, "error":"Too few players"};
+    scores = {p: 0 for p in programs}
+    if len(programs) <= 1:
+        return {"ok": False, "error": "Too few players"}
     mus = list(getAllMatchUps(programs))
     shuffle(mus)
     muCount = len(mus)
     playedGames = 0
     starterThread = threading.Thread()
-    starterThread.run = lambda : [TournamentThread(mu).start() for mu in mus]
+    starterThread.run = lambda: [TournamentThread(mu).start() for mu in mus]
     starterThread.start()
-    return {"ok":True}
+    return {"ok": True}
 
 
 @app.get("/tournament", response_class=JSONResponse)
 async def tournament():
     return {
-        "scores": {os.path.basename(f).removesuffix(".py"):s for f, s in scores.items()},
+        "scores": {os.path.basename(f).removesuffix(".py"): s for f, s in scores.items()},
         "played": playedGames,
         "games": muCount,
     }
@@ -437,6 +461,7 @@ async def tournamentDisplay():
     with open("html/tournament.html") as f:
         return f.read()
 
+
 @app.get("/favicon.ico")
 async def favicon():
     def iterfile():
@@ -445,9 +470,11 @@ async def favicon():
 
     return StreamingResponse(iterfile(), media_type="ico")
 
+
 @app.post("/validatePW", response_class=JSONResponse)
-async def validatePW(wrapper : pwWrapper):
+async def validatePW(wrapper: pwWrapper):
     return wrapper.pw == adminPW
+
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin():
