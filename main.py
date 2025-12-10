@@ -29,6 +29,7 @@ makedirs(cppPath, exist_ok=True)
 makedirs(exePath, exist_ok=True)
 
 USE_DOCKER = True
+DEBUG = True
 
 
 class ProgramHandler:
@@ -40,12 +41,17 @@ class ProgramHandler:
         self.j = j
 
         cmd = [
-            "docker", "run", "--rm", "-i",
+            "docker", "run", "--rm", "-i", "--init",
             "--network", "none",
             "-v", f"{os.path.abspath(path)}:/app/program:ro",
-            "python:3.13-slim" if path.endswith(".py") else "ubuntu:latest",
-            "python", "/app/program" if path.endswith(".py") else "/app/program"
+            ("python:3.13-slim" if path.endswith(".py") else "ubuntu:latest"),
+            ("python" if path.endswith(".py") else "/app/program")
         ]
+
+        if path.endswith(".py"):
+            cmd.append("/app/program")
+
+        cmd.append(f"#{os.path.basename(path)}")
 
         if not USE_DOCKER:
             if path.endswith(".py"):
@@ -85,7 +91,8 @@ class ProgramHandler:
 
     def __del__(self):
         try:
-            self.p.kill()
+            self.p.terminate()
+            # self.p.kill()
         except Exception:
             pass
 
@@ -405,6 +412,9 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
     for gs in game(programs, k, w):
         if gs[0]:
             _, ending, winner, value = gs
+            if DEBUG:
+                print("ERROR:")
+                print(value)
             return {"n": n, "k": k, "w": w, "names": names, "score-list": scoreList, "submission-list": submissionList, "ending": ending, "winner": winner, "value": value}
         else:
             scoreList.append(gs[1].copy())
