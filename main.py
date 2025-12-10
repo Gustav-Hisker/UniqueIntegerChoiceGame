@@ -1,9 +1,11 @@
+import json
 import os
 import random
 import string
 import subprocess
 import sys
 import threading
+from hashlib import sha256
 from os import makedirs
 from random import shuffle
 from subprocess import Popen, PIPE
@@ -19,18 +21,30 @@ pyPath = "./python-submissions/"
 cppPath = "./cpp-submissions/"
 exePath = "./executable-submissions/"
 
+teamsJsonPath = "./teams.json"
+
 adminPW = "".join([random.choice(string.ascii_letters + string.digits) for _ in range(8)])
 
 compileTimeout = 10
 testCode = "./examples/random-integers.py"
 
+USE_DOCKER = True
+DEBUG = True
+
 makedirs(pyPath, exist_ok=True)
 makedirs(cppPath, exist_ok=True)
 makedirs(exePath, exist_ok=True)
 
-USE_DOCKER = True
-DEBUG = True
+if not os.path.exists(teamsJsonPath):
+    with open(teamsJsonPath, "w") as f:
+        f.write("{}")
 
+with open(teamsJsonPath, "r") as f:
+    teams = json.load(f)
+
+scores = {}
+muCount = 0
+playedGames = 0
 
 class ProgramHandler:
     def __init__(self, path: str, n: int, k: int, w: int, j: int) -> None:
@@ -412,19 +426,11 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
     for gs in game(programs, k, w):
         if gs[0]:
             _, ending, winner, value = gs
-            if DEBUG:
-                print("ERROR:")
-                print(value)
             return {"n": n, "k": k, "w": w, "names": names, "score-list": scoreList, "submission-list": submissionList, "ending": ending, "winner": winner, "value": value}
         else:
             scoreList.append(gs[1].copy())
             submissionList.append(gs[2].copy())
     return {"n": n, "k": k, "w": w, "names": names, "score-list": scoreList, "submission-list": submissionList, "ending": -1, "winner": -1, "value": "unknown error"}
-
-
-scores = {}
-muCount = 0
-playedGames = 0
 
 
 class TournamentThread(threading.Thread):
@@ -503,6 +509,48 @@ async def validatePW(wrapper: pwWrapper):
 async def admin():
     with open("html/admin.html") as f:
         return f.read()
+
+
+def pwHash(pw):
+    return sha256(pw.encode()).hexdigest()
+
+def saveTeams():
+    with open(teamsJsonPath, "w") as f:
+        json.dump(teams, f)
+
+class pwTeamWrapper(BaseModel):
+    pw: str
+    teamName: str
+
+@app.post("/createTeam", response_class=JSONResponse)
+async def startTournament(wrapper: pwTeamWrapper):
+    if wrapper.pw != adminPW:
+        return {"ok": False, "error": "Invalid password"}
+    global teams
+    if wrapper.teamName in teams:
+        return {"ok": False, "error": "Team already exists"}
+    teamPW = "".join([random.choice(string.ascii_letters + string.digits) for _ in range(8)])
+    h = pwHash(teamPW)
+    teams[wrapper.teamName] = h
+    saveTeams()
+    return {"ok": True, "pw": teamPW}
+
+
+@app.post("/removeTeam", response_class=JSONResponse)
+async def startTournament(wrapper: pwTeamWrapper):
+    if wrapper.pw != adminPW:
+        return {"ok": False, "error": "Invalid password"}
+    global teams
+    if wrapper.teamName not in teams:
+        return {"ok": False, "error": "Team doesn't exist"}
+    del teams[wrapper.teamName]
+    saveTeams()
+    return {"ok": True}
+
+@app.get("/teams", response_class=JSONResponse)
+async def getTeams():
+    return list(teams.keys())
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8080)

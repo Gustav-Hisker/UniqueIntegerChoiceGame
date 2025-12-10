@@ -33,11 +33,22 @@
 </div></form>
 <div id="board" hidden="hidden">
     <div><b>Start Tournament</b><button onclick="startTournament()">Start</button></div>
+    <div><b>Create Team</b><input type="text" id="createName" placeholder="team name"><button onclick="createTeam()">Start</button></div>
+    <div><b>Remove Team</b><input type="text" id="removeTeam" placeholder="team name"><button onclick="removeTeam()">Start</button></div>
+    <div>
+        <b>Registered teams:</b>
+        <ul id="teams">
+
+        </ul>
+    </div>
 </div>
 </body>
 <script>
     const validationUrl = "/validatePW"
     const startUrl = "/start-tournament"
+    const createUrl = "/createTeam"
+    const removeUrl = "/removeTeam"
+    const teamsURL = "/teams"
     let pw = ""
 
     function post(url, body){
@@ -64,6 +75,7 @@
         if (pwCorrect===true){
             document.getElementById("login").hidden = true;
             document.getElementById("board").hidden = false;
+            mainloop()
         } else {
             alert("Wrong password")
         }
@@ -88,6 +100,92 @@
         } catch (error) {
             alert("Error starting the tournament:\n" + error.message);
         }
+    }
+
+    async function createTeam(){
+        try {
+            const nameInput = document.getElementById("createName");
+            const name = nameInput.value;
+            nameInput.value = "";
+            if (name == "") return;
+
+            const response = await post(createUrl,{"pw":pw, "teamName":name});
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            let json = (await response.json());
+            console.log(json)
+            if (json.ok !== true){
+                if (json.error){
+                    alert(json.error);
+                } else {
+                    alert("Somewhere something somehow went wrong");
+                }
+            } else {
+                alert("The generated password is:\n" + json.pw)
+            }
+        } catch (error) {
+            alert("Error creating the team:\n" + error.message);
+        }
+    }
+
+    async function removeTeam(){
+        try {
+            const nameInput = document.getElementById("removeName");
+            const name = nameInput.value;
+            nameInput.value = "";
+            if (name == "") return;
+
+            const response = await post(removeUrl,{"pw":pw, "teamName":name});
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            let json = (await response.json());
+            console.log(json)
+            if (json.ok !== true){
+                if (json.error){
+                    alert(json.error);
+                } else {
+                    alert("Somewhere something somehow went wrong");
+                }
+            } else {
+                alert("The generated password is:\n" + json.pw)
+            }
+        } catch (error) {
+            alert("Error creating the team:\n" + error.message);
+        }
+    }
+
+    async function getTeams() {
+        try {
+            const response = await fetch(teamsURL);
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+            console.log(result);
+            return result;
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
+    async function mainloop(){
+        const teamList = document.getElementById("teams");
+        let teamHTML = "";
+
+        const teams = await getTeams();
+        for (const t of teams){
+            teamHTML += "<li>" + t + "</li>";
+        }
+
+        teamList.innerHTML = teamHTML;
+
+
+        setTimeout(mainloop, 1000)
     }
 </script>
 </html>
