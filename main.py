@@ -28,6 +28,15 @@ adminPW = "".join([random.choice(string.ascii_letters + string.digits) for _ in 
 compileTimeout = 10
 testCode = "./examples/random-integers.py"
 
+MinPlayerCount = 2
+MaxPlayerCount = 6
+
+MinK = 3
+MaxK = 10
+
+MinW = 10
+MaxW = 20
+
 USE_DOCKER = True
 DEBUG = True
 
@@ -399,10 +408,20 @@ async def background():
     return StreamingResponse(iterfile(), media_type="jpeg")
 
 
-def getAllMatchUps(programs):
-    for n in range(3, 6):
-        yield from getAllMatchUpsWithFixedSize(programs, n)
+def getAllMatchUps():
+    for n in range(MinPlayerCount, MaxPlayerCount+1):
+        for k in range(MinK, MinK+1):
+            for w in range(MinW, MaxW+1):
+                for mu in getAllMatchUpsWithFixedSize(allPrograms(), n):
+                    yield n, k, w, mu
 
+
+def getRandomMatchUp():
+    n = random.randint(MinPlayerCount, min(MaxPlayerCount, len(allPrograms())))
+    k = random.randint(MinK, MaxK)
+    w = random.randint(MinW, MaxW)
+    mu = random.choice(list(getAllMatchUpsWithFixedSize(allPrograms(),n)))
+    return n, k, w, mu
 
 def getAllMatchUpsWithFixedSize(programs, n):
     if n > len(programs):
@@ -416,16 +435,14 @@ def getAllMatchUpsWithFixedSize(programs, n):
 
 
 @app.get("/randomGame", response_class=JSONResponse)
-def randomGame(n: int = 8, k: int = 5, w: int = 20):
-    programs = []
-    for i in range(n):
-        programs.append(random.choice(allPrograms()))
+def randomGame():
+    n, k, w, mu = getRandomMatchUp()
 
-    names = [os.path.basename(f).removesuffix(".py") for f in programs]
+    names = [os.path.basename(f).removesuffix(".py") for f in mu]
 
     scoreList = []
     submissionList = []
-    for gs in game(programs, k, w):
+    for gs in game(mu, k, w):
         if gs[0]:
             _, ending, winner, value = gs
             return {"n": n, "k": k, "w": w, "names": names, "score-list": scoreList, "submission-list": submissionList, "ending": ending, "winner": winner, "value": value}
@@ -436,16 +453,16 @@ def randomGame(n: int = 8, k: int = 5, w: int = 20):
 
 
 class TournamentThread(threading.Thread):
-    def __init__(self, mu):
+    def __init__(self, setting):
         threading.Thread.__init__(self)
-        self.mu = mu
+        self.n, self.k, self.w, self.mu  = setting
 
     def run(self):
         global scores, playedGames
         d = 0
         id = 0
 
-        for cs in game(self.mu, 5, 20):
+        for cs in game(self.mu, self.k, self.w):
             _, id, d, _ = cs
 
         scores[self.mu[id]] += d
@@ -468,7 +485,7 @@ async def startTournament(wrapper: pwWrapper):
     scores = {p: 0 for p in programs}
     if len(programs) <= 1:
         return {"ok": False, "error": "Too few players"}
-    mus = list(getAllMatchUps(programs))
+    mus = list(getAllMatchUps())
     shuffle(mus)
     muCount = len(mus)
     playedGames = 0
