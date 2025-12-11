@@ -177,7 +177,7 @@ def game(paths: list[str], k: int, w: int):
     while programs:
         del programs[0]
 
-    yield True, 0, -1, "Draw"
+    yield True, 0, 0, "Draw"
     return
 
 
