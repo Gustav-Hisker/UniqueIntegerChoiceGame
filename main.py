@@ -38,7 +38,6 @@ MinW = 10
 MaxW = 20
 
 USE_DOCKER = True
-DEBUG = True
 
 makedirs(pyPath, exist_ok=True)
 makedirs(cppPath, exist_ok=True)
