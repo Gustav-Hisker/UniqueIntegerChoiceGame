@@ -183,9 +183,9 @@ def game(paths: list[str], k: int, w: int):
 def testProgram(path: str):
     for i in range(25):
         try:
-            n = random.randint(MinPlayerCount, MaxPlayerCount + 1)
-            k = random.randint(MinK, MaxK + 1)
-            w = random.randint(MinW, MaxW + 1)
+            n = random.randint(MinPlayerCount, MaxPlayerCount)
+            k = random.randint(MinK, MaxK)
+            w = random.randint(MinW, MaxW)
             j = random.randrange(0, n)
 
             paths = [(path if i == j else testCode) for i in range(n)]
