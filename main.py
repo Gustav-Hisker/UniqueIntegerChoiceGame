@@ -210,20 +210,19 @@ async def root():
     with open("html/index.html") as f:
         return f.read()
 
+
 # PYTHON
-
-
 @app.post("/upload.py", response_class=HTMLResponse)
-async def wrapperUploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
-    return StreamingResponse(uploadPy(team, file), media_type="html")
+async def wrapperUploadPy(team: Annotated[str, Form()], pw: Annotated[str, Form()], file: UploadFile = File(...)):
+    return StreamingResponse(uploadPy(team, pw, file), media_type="html")
 
 
-def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
+def uploadPy(team: str, pw: str, file: UploadFile = File(...)):
     with open("html/preset.html") as f:
         yield f.read()
 
-    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"):
-        yield "<h1>Fuck Off</h1> This team name is not valid."
+    if team not in teams.keys() or teams[team] != pwHash(pw):
+        yield "<h1>Invalid credentials</h1> Either the team name or the password is wrong."
         return
 
     yield "<h2>Submitting python file</h2>"
@@ -247,6 +246,7 @@ def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
             return
 
     yield "<h3>Saving file</h3>"
+    deleteTeamSubmissions(team)
     os.replace(pyPath + team + ".temp.py", pyPath + team + ".py")
     yield "<p>Saving successful<p>"
 
@@ -261,16 +261,16 @@ def uploadPy(team: Annotated[str, Form()], file: UploadFile = File(...)):
 
 
 @app.post("/upload.cpp", response_class=HTMLResponse)
-async def wrapperUploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
-    return StreamingResponse(uploadCpp(team, file), media_type="html")
+async def wrapperUploadCpp(team: Annotated[str, Form()], pw: Annotated[str, Form()], file: UploadFile = File(...)):
+    return StreamingResponse(uploadCpp(team, pw, file), media_type="html")
 
 
-def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
+def uploadCpp(team: str, pw: str, file: UploadFile = File(...)):
     with open("html/preset.html") as f:
         yield f.read()
 
-    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"):
-        yield "<h1>Fuck Off</h1> This team name is not valid."
+    if team not in teams.keys() or teams[team] != pwHash(pw):
+        yield "<h1>Invalid credentials</h1> Either the team name or the password is wrong."
         return
 
     yield "<h2>Submitting C++ file</h2>"
@@ -305,6 +305,7 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
             return
 
     yield "<h3>Saving file</h3>"
+    deleteTeamSubmissions(team)
     os.replace(exePath + team + ".temp", exePath + team)
     yield "<p>Saving successful<p>"
 
@@ -319,16 +320,16 @@ def uploadCpp(team: Annotated[str, Form()], file: UploadFile = File(...)):
 
 
 @app.post("/upload.exe", response_class=HTMLResponse)
-async def wrapperUploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
-    return StreamingResponse(uploadExe(team, file), media_type="html")
+async def wrapperUploadExe(team: Annotated[str, Form()], pw: Annotated[str, Form()], file: UploadFile = File(...)):
+    return StreamingResponse(uploadExe(team, pw, file), media_type="html")
 
 
-def uploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
+def uploadExe(team: str, pw : str, file: UploadFile = File(...)):
     with open("html/preset.html") as f:
         yield f.read()
 
-    if team is None or team == "" or team.endswith(".temp") or team.endswith(".py"):
-        yield "<h1>Fuck Off</h1> This team name is not valid."
+    if team not in teams.keys() or teams[team] != pwHash(pw):
+        yield "<h1>Invalid credentials</h1> Either the team name or the password is wrong."
         return
 
     yield "<h2>Submitting executable</h2>"
@@ -353,6 +354,7 @@ def uploadExe(team: Annotated[str, Form()], file: UploadFile = File(...)):
             return
 
     yield "<h3>Saving file</h3>"
+    deleteTeamSubmissions(team)
     os.replace(exePath + team + ".temp", exePath + team)
     yield "<p>Saving successful<p>"
 
@@ -518,6 +520,16 @@ def saveTeams():
     with open(teamsJsonPath, "w") as f:
         json.dump(teams, f)
 
+def deleteTeamSubmissions(team):
+    paths = [
+        f"./executable-submissions/{team}",
+        f"./cpp-submissions/{team}.cpp",
+        f"./python-submissions/{team}.py",
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            os.remove(p)
+
 class pwTeamWrapper(BaseModel):
     pw: str
     teamName: str
@@ -529,6 +541,8 @@ async def startTournament(wrapper: pwTeamWrapper):
     global teams
     if wrapper.teamName in teams:
         return {"ok": False, "error": "Team already exists"}
+    if wrapper.teamName is None or wrapper.teamName == "" or wrapper.teamName.endswith(".temp") or wrapper.teamName.endswith(".py"):
+        return {"ok": False, "error": "This team name is not valid."}
     teamPW = "".join([random.choice(string.ascii_letters + string.digits) for _ in range(8)])
     h = pwHash(teamPW)
     teams[wrapper.teamName] = h
@@ -545,6 +559,7 @@ async def startTournament(wrapper: pwTeamWrapper):
         return {"ok": False, "error": "Team doesn't exist"}
     del teams[wrapper.teamName]
     saveTeams()
+    deleteTeamSubmissions(wrapper.teamName)
     return {"ok": True}
 
 @app.get("/teams", response_class=JSONResponse)

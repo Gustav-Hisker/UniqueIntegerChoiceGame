@@ -33,8 +33,12 @@
 </div></form>
 <div id="board" hidden="hidden">
     <div><b>Start Tournament</b><button onclick="startTournament()">Start</button></div>
-    <form><div><b>Create Team</b><input type="text" id="createName" placeholder="team name"><input type="submit" onclick="createTeam()" value="Create"></div></form>
-    <form><div><b>Remove Team</b><input type="text" id="removeName" placeholder="team name"><input type="submit" onclick="removeTeam()" value="Remove"></div></form>
+    <form action="javascript:createTeam()"><div>
+        <b>Create Team</b><input type="text" id="createName" placeholder="team name"><input type="submit" value="Create">
+    </div></form>
+    <form action="javascript:removeTeam()"><div>
+        <b>Remove Team</b><input type="text" id="removeName" placeholder="team name"><input type="submit" value="Remove">
+    </div></form>
     <div>
         <b>Registered teams:</b>
         <ul id="teams"></ul>

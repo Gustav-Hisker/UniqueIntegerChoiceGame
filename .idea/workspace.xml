@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97f08611-b4a1-41f2-a997-2190dd4c7fa4" name="Changes" comment="Created team management">
+    <list default="true" id="97f08611-b4a1-41f2-a997-2190dd4c7fa4" name="Changes" comment="Restyled admin.html&#10;and corrected copy paste errors in the html files">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/html/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/html/admin.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/html/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/html/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +107,7 @@
       <workItem from="1765024521095" duration="1318000" />
       <workItem from="1765293280031" duration="710000" />
       <workItem from="1765295172755" duration="15705000" />
-      <workItem from="1765437499551" duration="948000" />
+      <workItem from="1765437499551" duration="3739000" />
     </task>
     <task id="LOCAL-00001" summary=".">
       <option name="closed" value="true" />
@@ -164,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765405662571</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Restyled admin.html&#10;and corrected copy paste errors in the html files">
+      <option name="closed" value="true" />
+      <created>1765438610911</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1765438610911</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -191,7 +200,8 @@
     <MESSAGE value="." />
     <MESSAGE value="Fixed the vm-leak" />
     <MESSAGE value="Created team management" />
-    <option name="LAST_COMMIT_MESSAGE" value="Created team management" />
+    <MESSAGE value="Restyled admin.html&#10;and corrected copy paste errors in the html files" />
+    <option name="LAST_COMMIT_MESSAGE" value="Restyled admin.html&#10;and corrected copy paste errors in the html files" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/UniqueIntegerChoiceGame$1_temp.coverage" NAME="1.temp Coverage Results" MODIFIED="1762457901908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/python-submissions" />
