@@ -24,7 +24,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
 </head>
 <body>
-<h1>Unique Auction Card Game</h1>
+<h1>Unique Integer Choice Game</h1>
 <h2>Admin Board</h2>
 <form id="login" action="javascript:enterPW()"><div>
     <h3 style="margin-top: 0">Enter the admin password to log in.</h3>
@@ -33,13 +33,11 @@
 </div></form>
 <div id="board" hidden="hidden">
     <div><b>Start Tournament</b><button onclick="startTournament()">Start</button></div>
-    <div><b>Create Team</b><input type="text" id="createName" placeholder="team name"><button onclick="createTeam()">Start</button></div>
-    <div><b>Remove Team</b><input type="text" id="removeTeam" placeholder="team name"><button onclick="removeTeam()">Start</button></div>
+    <form><div><b>Create Team</b><input type="text" id="createName" placeholder="team name"><input type="submit" onclick="createTeam()" value="Create"></div></form>
+    <form><div><b>Remove Team</b><input type="text" id="removeName" placeholder="team name"><input type="submit" onclick="removeTeam()" value="Remove"></div></form>
     <div>
         <b>Registered teams:</b>
-        <ul id="teams">
-
-        </ul>
+        <ul id="teams"></ul>
     </div>
 </div>
 </body>
@@ -151,7 +149,7 @@
                     alert("Somewhere something somehow went wrong");
                 }
             } else {
-                alert("The generated password is:\n" + json.pw)
+                alert("Team \"" + name + "\" successfully removed");
             }
         } catch (error) {
             alert("Error creating the team:\n" + error.message);
