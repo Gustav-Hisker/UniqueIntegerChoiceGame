@@ -27,20 +27,20 @@
 <h1>Unique Integer Choice Game</h1>
 <h2>Explanation of the Task</h2>
 <p>
-    So the game is the following: You're in a pool of $n$ players. Also given are $k, w \in \Bbb Z^+$. You know $n$, $k$ and $w$.
+    So the game is the following: You're in a pool of $n$ players, given are also $k, w \in \Bbb Z^+$. You know $n$, $k$ and $w$.
     Each turn you submit an integer $i$ where $1 \le i \le k$.
     If you're the only one who submitted this integer then you get $i$ points added to your score $s$. Which starts at $0$.
 </p>
 <p>
-    If $s \equiv 0 \pmod w \land s\not=0$ you've won.
+    If $s \equiv 0 \pmod w$ and  $s\not=0$ you've won.
 </p>
 <p>
     After each turn you're told about the turns of all the other people.
 </p>
 <h2>Explanation of the input and output format.</h2>
 <p>
-    At the beginning of a new game your program is executed as a new process. Meaning you can't remember previous games.
-    But indeed you can remember the previous rounds in the current game you're playing.
+    At the beginning of a new game your program is executed as a new process, meaning that you can't remember previous games.
+    But you can remember the previous rounds in the current game you're playing.
 </p>
 <p>
     All the input you get by <code>stdin</code>.
@@ -49,7 +49,7 @@
     This means for example you can output using <code>cout</code> in C++ and using <code>print</code> or <code>printf</code> in python.
 </p>
 <p>
-    As input initially it's send the number $n$, $k$, $w$ and $j$ where $n$, $k$ and $w$ are as before and $j$ is your position in the pool of players.
+    The input is initially the numbers $n$, $k$, $w$ and $j$ where $n$, $k$ and $w$ are as before and $j$ is your position in the pool of players.
     This is done in the following format followed by a linebreak (<code>"\n"</code>):
     <br><code>n k w j</code><br>
     For example if $n=10$ (so there are $10$ players), $k=5$ (meaning you can choose your numbers between $1$ and $5$),
@@ -63,7 +63,7 @@
 </p>
 <p>
     Now you get all the submissions $i_0, ..., i_j, ... i_{n-1}$ that were done by you and the other players.
-    Where $i_x$ is the number submitted by the $x$-th player. So $i_j$ is the number you submitted.
+    Where $i_m$ is the number submitted by the $m$-th player. So $i_j$ is the number you submitted.
     Your code gets them in the following format:
     <br><code>i_0 i_1 ... i_j ... i_(n-1)</code>
 </p>
@@ -73,7 +73,7 @@
     (In this case the second/$1$-th player gets $3$ points and the last one gets $2$ points)
 </p>
 <p>
-    Then again you have to submit a new number and . From here on it just repeats.
+    Then again you have to submit a new number and so do your opponents, whose choices you get as inputs, and maybe you get points. From here, the game repeats until one person has won.
 </p>
 <p>
     As an example for a whole game. Here the "conversation" between <span style="color:magenta">your program</span> and <span style="color:green">the game</span>:
