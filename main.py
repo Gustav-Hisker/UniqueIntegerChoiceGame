@@ -184,9 +184,9 @@ def game(paths: list[str], k: int, w: int):
 def testProgram(path: str):
     for i in range(25):
         try:
-            n = random.randint(2, 100)
-            k = random.randint(1, 100)
-            w = random.randint(1, 100)
+            n = random.randint(MinPlayerCount, MaxPlayerCount + 1)
+            k = random.randint(MinK, MaxK + 1)
+            w = random.randint(MinW, MaxW + 1)
             j = random.randrange(0, n)
 
             paths = [(path if i == j else testCode) for i in range(n)]
@@ -266,9 +266,8 @@ def uploadPy(team: str, pw: str, file: UploadFile = File(...)):
     yield "</body></html>"
     return
 
+
 # C++
-
-
 @app.post("/upload.cpp", response_class=HTMLResponse)
 async def wrapperUploadCpp(team: Annotated[str, Form()], pw: Annotated[str, Form()], file: UploadFile = File(...)):
     return StreamingResponse(uploadCpp(team, pw, file), media_type="html")
@@ -460,12 +459,12 @@ class TournamentThread(threading.Thread):
     def run(self):
         global scores, playedGames
         d = 0
-        id = 0
+        ID = 0
 
         for cs in game(self.mu, self.k, self.w):
-            _, id, d, _ = cs
+            _, d, ID, _ = cs
 
-        scores[self.mu[id]] += d
+        scores[self.mu[ID]] += d
 
         playedGames += 1
 
@@ -486,6 +485,7 @@ async def startTournament(wrapper: pwWrapper):
     if len(programs) <= 1:
         return {"ok": False, "error": "Too few players"}
     mus = list(getAllMatchUps())
+    print(mus)
     shuffle(mus)
     muCount = len(mus)
     playedGames = 0
