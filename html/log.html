@@ -104,11 +104,14 @@
                 spends.innerText += names[j] + ": " + sub_list[i][j]+ ", ";
             }
 
-            winnerField.innerText = "Nobody";
+            winnerField.innerText = "";
             for (let j = 0; j < n; j++) {
                 if ((i >= 1 ? score_list[i - 1][j] : 0) !== score_list[i][j]) {
                     winnerField.innerText += names[j] + ": " + (score_list[i][j] - (i >= 1 ? score_list[i - 1][j] : 0))+ ", "
                 }
+            }
+            if (winnerField.innerText == ""){
+                winnerField.innerText = "Nobody";
             }
 
 
