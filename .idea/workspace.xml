@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97f08611-b4a1-41f2-a997-2190dd4c7fa4" name="Changes" comment="Fixed an edge case for the tournament" />
+    <list default="true" id="97f08611-b4a1-41f2-a997-2190dd4c7fa4" name="Changes" comment="Fixed random game">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -102,7 +104,7 @@
       <workItem from="1765024521095" duration="1318000" />
       <workItem from="1765293280031" duration="710000" />
       <workItem from="1765295172755" duration="15705000" />
-      <workItem from="1765437499551" duration="8751000" />
+      <workItem from="1765437499551" duration="12074000" />
     </task>
     <task id="LOCAL-00001" summary=".">
       <option name="closed" value="true" />
@@ -200,7 +202,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765448864902</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary=".">
+      <option name="closed" value="true" />
+      <created>1765449438302</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1765449438302</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Fixed random game">
+      <option name="closed" value="true" />
+      <created>1765453002023</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1765453002023</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -224,7 +242,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="." />
     <MESSAGE value="Fixed the vm-leak" />
     <MESSAGE value="Created team management" />
     <MESSAGE value="Restyled admin.html&#10;and corrected copy paste errors in the html files" />
@@ -232,7 +249,9 @@
     <MESSAGE value="Updated match up logic" />
     <MESSAGE value="Fixed testing" />
     <MESSAGE value="Fixed an edge case for the tournament" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed an edge case for the tournament" />
+    <MESSAGE value="." />
+    <MESSAGE value="Fixed random game" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed random game" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/UniqueIntegerChoiceGame$1_temp.coverage" NAME="1.temp Coverage Results" MODIFIED="1762457901908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/python-submissions" />
