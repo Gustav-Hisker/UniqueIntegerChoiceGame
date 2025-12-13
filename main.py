@@ -164,14 +164,20 @@ def game(paths: list[str], k: int, w: int):
         for i, s in enumerate(submissions):
             if submissionCounts[s] <= 1:
                 scores[i] += s
-                if scores[i] % w == 0:
-                    yield False, scores, submissions, "current game state"
-                    while programs:
-                        del programs[0]
-                    yield True, 1, i, "Win"
-                    return
 
         yield False, scores, submissions, "current game state"
+
+        for i, s in enumerate(scores):
+            if s != 0 and s % w == 0:
+                while programs:
+                    del programs[0]
+                for j, t in enumerate(scores[i+1:]):
+                    if t != 0 and t % w == 0:
+                        yield True, 0, 0, "Draw by foto finish"
+                        return
+                yield True, 1, i, "Win"
+                return
+
 
     while programs:
         del programs[0]
