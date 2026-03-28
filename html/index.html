@@ -27,33 +27,37 @@
 <h1>Unique Integer Choice Game</h1>
 <h2>Explanation of the Task</h2>
 <p>
-    So the game is the following: You're in a pool of $n$ players. Also given are $k, w \in \Bbb Z^+$. You know $n$, $k$ and $w$.
+    So the game is the following: You're in a pool of $n$ players and given are positive integers $k, w$. You know, $n$, $k$ and $w$.
     Each turn you submit an integer $i$ where $1 \le i \le k$.
-    If you're the only one who submitted this integer then you get $i$ points added to your score $s$. Which starts at $0$.
+    If you're the only one who submitted this integer then you get $i$ points added to your score $s$, starting at $0$.
 </p>
 <p>
-    If $s \equiv 0 \pmod w \land s\not=0$ you've won.
+    If $s \equiv 0 \pmod w$ and $ s\not=0$, you've won (so if $s$ is divisible by $w$). If multiple people finish at the same time, 
+    no one wins.
 </p>
 <p>
-    After each turn you're told about the turns of all the other people.
+    After each turn you're told about the plays of all the other people.
+</p>
+<p>
+    In the tournament, the game is then played multiple times i, and whoever wins the most games wins the most times wins the tournament.
 </p>
 <h2>Explanation of the input and output format.</h2>
 <p>
-    At the beginning of a new game your program is executed as a new process. Meaning you can't remember previous games.
-    But indeed you can remember the previous rounds in the current game you're playing.
+    At the beginning of a new game your program is executed as a new process, meaning you can't remember previous games.
+    But you can remember the previous rounds in the current game you're playing.
 </p>
 <p>
-    All the input you get by <code>stdin</code>.
-    This means for example you can get the input with <code>cin</code> in C++ and <code>input()</code> in python.
-    The output the game requires from you can be submitted via <code>stdout</code>.
-    This means for example you can output using <code>cout</code> in C++ and using <code>print</code> or <code>printf</code> in python.
+    You get all the input by <code>stdin</code>.
+    For example, this means that you can get the input with <code>cin</code> in C++ and <code>input()</code> in python.
+    The output the game requires from you, can be submitted via <code>stdout</code>.
+    So you can output using <code>cout</code> in C++ and using <code>print</code> or <code>printf</code> in python.
 </p>
 <p>
-    As input initially it's send the number $n$, $k$, $w$ and $j$ where $n$, $k$ and $w$ are as before and $j$ is your position in the pool of players.
+    The intial input is given by the number $n$, $k$, $w$ and $j$ where $n$, $k$ and $w$ are as before and $j$ is your position in the pool of players.
     This is done in the following format followed by a linebreak (<code>"\n"</code>):
     <br><code>n k w j</code><br>
     For example if $n=10$ (so there are $10$ players), $k=5$ (meaning you can choose your numbers between $1$ and $5$),
-    $w=50$ (you win with a score equal to a multiple of $50$) and you're number is $7$ the input looks like this:
+    $w=50$ (you win with a score equal to a multiple of $50$) and you're number is $7$, the input looks like this:
     <br><code>10 5 50 7</code><br>
 </p>
 <p>
@@ -62,18 +66,18 @@
     <b>IMPORTANT:</b> You have to end your output with a linebreak (<code>"\n"</code>).
 </p>
 <p>
-    Now you get all the submissions $i_0, ..., i_j, ... i_{n-1}$ that were done by you and the other players.
-    Where $i_x$ is the number submitted by the $x$-th player. So $i_j$ is the number you submitted.
-    Your code gets them in the following format:
+    Now you get all the submissions $i_0, ..., i_j, ... i_{n-1}$ that created by you and the other players,
+    where $i_m$ is the number submitted by the $m$-th player. So $i_j$ is the number you submitted.
+    Your program gets them in the following format:
     <br><code>i_0 i_1 ... i_j ... i_(n-1)</code>
 </p>
 <p>
-    As an example: There are 4 players. The first/$0$-th player submits $1$, the second/$1$-th player submits $3$, the next one submits $1$ and the last one submits $2$.
+    As an example: There are 4 players. The first player (index $0$) submits $1$, the second player (index $1$) submits $3$, the next one submits $1$ and the last one submits $2$.
     <br><code>1 3 1 2</code><br>
-    (In this case the second/$1$-th player gets $3$ points and the last one gets $2$ points)
+    (In this case the second player gets $3$ points and the last one gets $2$ points)
 </p>
 <p>
-    Then again you have to submit a new number and . From here on it just repeats.
+    Then again you have to submit a new number and receive the inputs from other players, and so on. From here, the game repeats until someone wins.
 </p>
 <p>
     As an example for a whole game. Here the "conversation" between <span style="color:magenta">your program</span> and <span style="color:green">the game</span>:
